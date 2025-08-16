@@ -1,16 +1,18 @@
 const { getConnection } = require('../config/dbConnection');
 
+
 exports.getAllWordings = async (req, res) => {
   try {
-    const pool = await getConnection();
-    const result = await pool.request().query('SELECT * FROM AppWordings');
-    res.json(result.recordset);
+    const connection = await getConnection();
+    const [rows] = await connection.execute('SELECT * FROM AppWordings');
+    res.json(rows);
   } catch (err) {
     console.error('Error fetching wordings:', err);
     res.status(500).json({ error: 'Server error' });
   }
 };
 
+// Updating by key
 exports.updateWording = async (req, res) => {
   const key = req.params.key;
   const { value } = req.body;
@@ -20,13 +22,11 @@ exports.updateWording = async (req, res) => {
   }
 
   try {
-    const pool = await getConnection();
-    await pool
-      .request()
-      .input('KeyName', key)
-      .input('Value', value)
-      .query('UPDATE AppWordings SET Value = @Value, UpdatedAt = GETDATE() WHERE KeyName = @KeyName');
-
+    const connection = await getConnection();
+    await connection.execute(
+      'UPDATE AppWordings SET Value = ?, UpdatedAt = NOW() WHERE KeyName = ?',
+      [value, key]
+    );
     res.json({ success: true });
   } catch (err) {
     console.error('Error updating wording:', err);
