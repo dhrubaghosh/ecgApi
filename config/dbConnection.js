@@ -1,26 +1,38 @@
-// dbConnection.js
+// config/dbConnection.js
 const mysql = require('mysql2/promise');
 
 let pool;
 
-async function getConnection() {
+const getConnection = async () => {
   if (!pool) {
-    // Prefer MYSQL_URL (internal) when available (inside Railway)
-    // Fallback to MYSQL_PUBLIC_URL (for local dev)
-    const url = process.env.MYSQL_URL || process.env.MYSQL_PUBLIC_URL;
+    // 👇 Toggle between local & Railway manually here
+    const useLocal = false; // change to true when testing locally
 
-    pool = mysql.createPool(url);
+    const config = useLocal
+      ? {
+          host: 'metro.proxy.rlwy.net',
+          port: 36227,
+          user: 'root',
+          password: 'lAngSqcgBcnpRgtAZsCjkXJNdhuEXDag',
+          database: 'railway',
+        }
+      : {
+          host: 'mysql.railway.internal',
+          port: 3306,
+          user: 'root',
+          password: 'lAngSqcgBcnpRgtAZsCjkXJNdhuEXDag',
+          database: 'railway',
+        };
 
-    // Log sanitized info (without password)
-    const u = new URL(url);
-    console.log('DB CONFIG:', {
-      host: u.hostname,
-      port: u.port,
-      user: u.username,
-      database: u.pathname.replace('/', ''),
+    console.log('✅ Using DB config:', config);
+
+    pool = mysql.createPool({
+      ...config,
+      connectionLimit: 5,
     });
   }
+
   return pool;
-}
+};
 
 module.exports = { getConnection };
