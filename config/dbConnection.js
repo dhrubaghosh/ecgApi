@@ -1,10 +1,9 @@
-// config/dbConnection.js
+
 const mysql = require('mysql2/promise');
 
 let pool;
 const getConnection = async () => {
   if (!pool) {
-    // Use Railway's public proxy host/port – works everywhere
     const config = {
       host: 'metro.proxy.rlwy.net',
       port: 36227,
@@ -22,7 +21,7 @@ const getConnection = async () => {
     });
 
     pool = mysql.createPool({ ...config, connectionLimit: 5 });
-    console.log('✅ MySQL pool created');
+    console.log('MySQL pool created');
   }
   return pool;
 };
