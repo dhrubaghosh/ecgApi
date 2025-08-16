@@ -9,7 +9,7 @@ const { getConnection } = require('./config/dbConnection');
 const app = express();
 const allowedOrigins = [
   'http://localhost:5173',        
-  process.env.FRONTEND_ORIGIN     
+  'https://ecgwild.vercel.app'    
 ].filter(Boolean);
 
 app.use(cors({
